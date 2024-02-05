@@ -1,2 +1,4 @@
 # Go_Bootcamp
-Go Bootcamp
+
+- [Day 00](Day00/)
+

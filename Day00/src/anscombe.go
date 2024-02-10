@@ -5,13 +5,14 @@ import (
   "os"
   "fmt"
   "math"
+  "flag"
   "slices"
 )
 
 const errmsg string =
 `Incorrect input:
 expected a non-empty sequence of integers,
-strictly between -100000 and 100000.`
+strictly between -100000 and 100000 , separated by newlines`
 
 func readNums() []int {
   var nums []int
@@ -86,6 +87,17 @@ func standardDeviation(nums []int) float64 {
 }
 
 func main() {
+  meanFlag := flag.Bool("mean", true,
+                        "A bool. Unable/disable calculation of mean")
+  medianFlag := flag.Bool("median", true,
+                        "A bool. Unable/disable calculation of median")
+  modeFlag := flag.Bool("mode", true,
+                        "A bool. Unable/disable calculation of mode")
+  deviationFlag := flag.Bool("deviation", true,
+                        "A bool. Unable/disable calculation of deviation")
+                         
+  flag.Parse()
+
   nums := readNums()
   if nums == nil {
     fmt.Fprintln(os.Stderr, errmsg)
@@ -94,8 +106,16 @@ func main() {
 
   slices.Sort(nums)
 
-  fmt.Printf("Mean: %.2f\n", average(nums))
-  fmt.Printf("Median: %.2f\n", median(nums))
-  fmt.Printf("Mode: %d\n", mode(nums))
-  fmt.Printf("SD: %.2f\n", standardDeviation(nums))
+  if *meanFlag {
+    fmt.Printf("Mean: %.2f\n", average(nums))
+  }
+  if *medianFlag {
+    fmt.Printf("Median: %.2f\n", median(nums))
+  }
+  if *modeFlag { 
+    fmt.Printf("Mode: %d\n", mode(nums))
+  }
+  if *deviationFlag {
+    fmt.Printf("SD: %.2f\n", standardDeviation(nums))
+  }
 }

@@ -19,7 +19,6 @@ func readNums() []int {
 
   for {
     var num int
-
     _, err := fmt.Scanln(&num)
     if err == io.EOF {
       break
@@ -27,7 +26,6 @@ func readNums() []int {
     if err != nil || math.Abs(float64(num)) > 100000.0 {
       return nil
     }
-
     nums = append(nums, num)
   }
 
@@ -95,7 +93,6 @@ func main() {
                         "A bool. Unable/disable calculation of mode")
   deviationFlag := flag.Bool("deviation", true,
                         "A bool. Unable/disable calculation of deviation")
-                         
   flag.Parse()
 
   nums := readNums()
@@ -103,7 +100,6 @@ func main() {
     fmt.Fprintln(os.Stderr, errmsg)
     return
   }
-
   slices.Sort(nums)
 
   if *meanFlag {

@@ -6,6 +6,7 @@ import (
   "flag"
   "strings"
   "errors"
+  "encoding/xml"
   "encoding/json"
 )
 
@@ -32,19 +33,20 @@ func init() {
 }
 
 type Ingredient struct {
-  Name string  `json:"ingredient_name"`
-  Count string `json:"ingredient_count"`
-  Unit string  `json:"ingredient_unit,omitempty"`
+  Name  string `xml:"itemname" json:"ingredient_name"`
+  Count string `xml:"itemcount" json:"ingredient_count"`
+  Unit  string `xml:"itemunit" json:"ingredient_unit,omitempty"`
 }
 
 type CakeRecipe struct {
-  Name string              `json:"name"`
-  Time string              `json:"time"`
-  Ingredients []Ingredient `json:"ingredients"`
+  Name         string      `xml:"name" json:"name"`
+  Time         string      `xml:"stovetime" json:"time"`
+  Ingredients []Ingredient `xml:"ingredients>item" json:"ingredients"`
 }
 
 type CookBook struct {
-  Cakes []CakeRecipe `json:"cake"`
+  XMLName xml.Name     `xml:"recipes" json:"-"`
+  Cakes   []CakeRecipe `xml:"cake" json:"cake"`
 }
 
 type DBReader interface {
@@ -74,7 +76,17 @@ type XMLReader struct {
 }
 
 func (reader XMLReader) Read() (*CookBook, error) {
-  return nil, nil
+  data, err := os.ReadFile(reader.Filename)
+  if err != nil {
+    return nil, err
+  }
+
+  var cookbook CookBook
+  if err = xml.Unmarshal(data, &cookbook); err != nil {
+    return nil, err
+  }
+  
+  return &cookbook, nil  
 }
 
 type DBWriter interface {
@@ -84,7 +96,18 @@ type DBWriter interface {
 type JSONWriter struct {}
 
 func (writer JSONWriter) Write(cookbook CookBook) error {
-  data, err := json.MarshalIndent(cookbook, "", "    ")
+  data, err := json.MarshalIndent(cookbook, "", "  ")
+  if err != nil {
+    return err
+  }
+  fmt.Println(string(data))
+  return nil
+}
+
+type XMLWriter struct {}
+
+func (writer XMLWriter) Write(cookbook CookBook) error {
+  data, err := xml.MarshalIndent(cookbook, "", "    ")
   if err != nil {
     return err
   }
@@ -103,31 +126,24 @@ func main() {
 
   for _, f := range filenameFlag {
     var reader DBReader
+    var writer DBWriter
     if strings.HasSuffix(f, ".json") {
       reader = JSONReader{f}
+      writer = JSONWriter{}
     } else {
       reader = XMLReader{f}
+      writer = XMLWriter{}
     }
+
     cookbook, err := reader.Read()
     if err != nil {
       fmt.Fprintf(os.Stderr, "%s: %s\n", f, err)
       return 
     }
 
-    if cookbook != nil {
-      fmt.Println(cookbook)
+    if err = writer.Write(*cookbook); err != nil {
+      fmt.Fprintf(os.Stderr, "%s: %s\n", f, err)
+      return 
     }
-
-    writer := JSONWriter{}
-
-    writer.Write(*cookbook)
-
-    //var writer DBWriter
-    //if strings.HasSuffix(f, ".json") {
-    //  writer = XMLWriter{cookbook}
-    //} else {
-    //  writer = JSONWriter{cookbook}
-    //}
-    //writer.Write()
   }
 }

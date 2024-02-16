@@ -32,10 +32,10 @@ type difference struct {
 
 type ingredientDifference struct {
   count int
-  newItemCount string
-  newItemUnit string
-  oldItemCount string
-  oldItemUnit string
+  newCount string
+  newUnit string
+  oldCount string
+  oldUnit string
 }
 
 const (
@@ -56,39 +56,43 @@ const (
 )
 
 func PrintCakeDifference(old, new *CookBook) {
-  cakeNames := make(map[string]*difference)
+  cakes := make(map[string]*difference)
   for _, cake := range new.Cakes {
-    if cakeNames[cake.Name] == nil {
-      dif := difference{count: 1, newTime: cake.Time, newIngredients: cake.Ingredients}
-      cakeNames[cake.Name] = &dif
+    if cakes[cake.Name] == nil {
+      dif := difference{
+        count: 1, newTime: cake.Time, newIngredients: cake.Ingredients,
+      }
+      cakes[cake.Name] = &dif
     } else {
-      cakeNames[cake.Name].count++
-      cakeNames[cake.Name].newTime = cake.Time
-      cakeNames[cake.Name].newIngredients = cake.Ingredients
+      cakes[cake.Name].count++
+      cakes[cake.Name].newTime = cake.Time
+      cakes[cake.Name].newIngredients = cake.Ingredients
     }
   }
   for _, cake := range old.Cakes {
-    if cakeNames[cake.Name] == nil {
-      dif := difference{count: -1, oldTime: cake.Time, oldIngredients: cake.Ingredients}
-      cakeNames[cake.Name] = &dif
+    if cakes[cake.Name] == nil {
+      dif := difference{
+        count: -1, oldTime: cake.Time, oldIngredients: cake.Ingredients,
+      }
+      cakes[cake.Name] = &dif
     } else {
-      cakeNames[cake.Name].count--
-      cakeNames[cake.Name].oldTime = cake.Time
-      cakeNames[cake.Name].oldIngredients = cake.Ingredients
+      cakes[cake.Name].count--
+      cakes[cake.Name].oldTime = cake.Time
+      cakes[cake.Name].oldIngredients = cake.Ingredients
 
     }
   }
-  for k, v := range cakeNames {
+  for k, v := range cakes {
     if v.count < 0 {
       fmt.Printf(CakeRemovedFmt, k)
     } else if v.count > 0 {
       fmt.Printf(CakeAddedFmt, k)
     }
     if v.count != 0 {
-      delete(cakeNames, k)
+      delete(cakes, k)
     }
   }
-  for k, v := range cakeNames {
+  for k, v := range cakes {
     if v.oldTime != v.newTime {
       fmt.Printf(TimeChangedFmt, k, v.newTime, v.oldTime)
     }
@@ -101,7 +105,7 @@ func PrintIngredientDifference(old, new []Ingredient, cake string) {
   for _, ing := range new {
     if ingredients[ing.Name] == nil {
       dif := ingredientDifference{
-        count: 1, newItemCount: ing.Count, newItemUnit: ing.Unit,
+        count: 1, newCount: ing.Count, newUnit: ing.Unit,
       }
       ingredients[ing.Name] = &dif
     }
@@ -109,13 +113,13 @@ func PrintIngredientDifference(old, new []Ingredient, cake string) {
   for _, ing := range old {
     if ingredients[ing.Name] == nil {
       dif := ingredientDifference{
-        count: -1, oldItemCount: ing.Count, oldItemUnit: ing.Unit,
+        count: -1, oldCount: ing.Count, oldUnit: ing.Unit,
       }
       ingredients[ing.Name] = &dif
     } else {
       ingredients[ing.Name].count--
-      ingredients[ing.Name].oldItemCount = ing.Count
-      ingredients[ing.Name].oldItemUnit = ing.Unit
+      ingredients[ing.Name].oldCount = ing.Count
+      ingredients[ing.Name].oldUnit = ing.Unit
     }
   }
   for k, v := range ingredients {
@@ -129,12 +133,12 @@ func PrintIngredientDifference(old, new []Ingredient, cake string) {
     }
   }
   for k, v := range ingredients {
-    if v.newItemUnit == "" && v.oldItemUnit != "" {
-      fmt.Printf(UnitRemovedFmt, v.oldItemUnit, k, cake)
-    } else if v.newItemUnit != v.oldItemUnit {
-      fmt.Printf(UnitChangedFmt, k, cake, v.newItemUnit,  v.oldItemUnit)
-    } else if v.newItemCount != v.oldItemCount {
-      fmt.Printf(UnitChangedFmt, k, cake, v.newItemCount,  v.oldItemCount)
+    if v.newUnit == "" && v.oldUnit != "" {
+      fmt.Printf(UnitRemovedFmt, v.oldUnit, k, cake)
+    } else if v.newUnit != v.oldUnit {
+      fmt.Printf(UnitChangedFmt, k, cake, v.newUnit,  v.oldUnit)
+    } else if v.newCount != v.oldCount {
+      fmt.Printf(UnitChangedFmt, k, cake, v.newCount,  v.oldCount)
     }
   }
 }

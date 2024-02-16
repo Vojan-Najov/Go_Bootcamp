@@ -129,10 +129,10 @@ func main() {
     var writer DBWriter
     if strings.HasSuffix(f, ".json") {
       reader = JSONReader{f}
-      writer = JSONWriter{}
+      writer = XMLWriter{}
     } else {
       reader = XMLReader{f}
-      writer = XMLWriter{}
+      writer = JSONWriter{}
     }
 
     cookbook, err := reader.Read()

@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 )
 
 type Settings struct {
@@ -44,7 +43,7 @@ func (s *Settings) handleSl(str string) error {
 func (s *Settings) handleExt(str string) error {
 	if !s.PrintFilenames {
 		return errors.New("works ONLY when -f is specified")
-	} else if len(strings.TrimSpace(str)) == 0 {
+	} else if len(str) == 0 {
 		return errors.New("incorrect value")
 	}
 	s.OnlyExt = true

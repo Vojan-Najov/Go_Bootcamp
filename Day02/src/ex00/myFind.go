@@ -20,29 +20,41 @@ func main() {
 				return nil
 			}
 
-			fullpath := fmt.Sprintf("%s/%s", settings.Dirname, path)
-
 			if entry.IsDir() {
-				if settings.PrintDirectories && path != "." {
-					fmt.Println(fullpath)
-				}
+				printDirname(path, settings)
 			} else if entry.Type()&fs.ModeSymlink != 0 {
-				if settings.PrintSymlinks {
-					path, err := filepath.EvalSymlinks(fullpath)
-					if err != nil {
-						path = "[broken]"
-					}
-					fmt.Printf("%s -> %s\n", fullpath, path)
-				}
+				printSymlink(path, settings)
 			} else {
-				if settings.PrintFilenames {
-					fmt.Println(fullpath)
-				}
+				printFilename(path, settings)
 			}
 			return nil
 		})
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
+	}
+}
+
+func printDirname(path string, stngs *settings.Settings) {
+	if stngs.PrintDirectories && path != stngs.Dirname {
+		fmt.Println(path)
+	}
+}
+
+func printSymlink(path string, stngs *settings.Settings) {
+	if stngs.PrintSymlinks {
+		pathlink, err := filepath.EvalSymlinks(path)
+		if err != nil {
+			pathlink = "[broken]"
+		}
+		fmt.Printf("%s -> %s\n", path, pathlink)
+	}
+}
+
+func printFilename(path string, stngs *settings.Settings) {
+	if stngs.PrintFilenames {
+		if !stngs.OnlyExt || stngs.OnlyExt && filepath.Ext(path) == stngs.Ext {
+			fmt.Println(path)
+		}
 	}
 }

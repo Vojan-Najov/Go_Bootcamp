@@ -53,22 +53,22 @@ func New(args []string) *Settings {
 		return nil
 	}
 
-  if stngs.CountLines && (stngs.CountWords || stngs.CountCharacters) ||
-     stngs.CountWords && stngs.CountCharacters {
-    fmt.Fprintln(os.Stderr, "A single flag is expected: -l, -w or -m")
+	if stngs.CountLines && (stngs.CountWords || stngs.CountCharacters) ||
+		stngs.CountWords && stngs.CountCharacters {
+		fmt.Fprintln(os.Stderr, "A single flag is expected: -l, -w or -m")
 		flagset.PrintDefaults()
 		return nil
-  }
+	}
 
-  if !(stngs.CountLines || stngs.CountWords || stngs.CountCharacters) {
-    stngs.CountWords = true  
-  }
+	if !(stngs.CountLines || stngs.CountWords || stngs.CountCharacters) {
+		stngs.CountWords = true
+	}
 
-  if flagset.NArg() == 0 {
-    stngs.Filenames = []string{"-"}
-  } else {
-    stngs.Filenames = flagset.Args()
-  }
+	if flagset.NArg() == 0 {
+		stngs.Filenames = []string{"-"}
+	} else {
+		stngs.Filenames = flagset.Args()
+	}
 
 	return &stngs
 }

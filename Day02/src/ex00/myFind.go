@@ -17,6 +17,9 @@ func main() {
 	err := filepath.WalkDir(settings.Dirname,
 		func(path string, entry fs.DirEntry, err error) error {
 			if err != nil {
+				if path == settings.Dirname {
+					return err
+				}
 				return nil
 			}
 
